@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 #Author-Notta
-#Description-test
+#Description-
 import adsk.core, adsk.fusion, adsk.cam, traceback
 
-#グローバル変数の初期化(宣言)
+# グローバル変数の初期化(宣言)
 _app = adsk.core.Application.cast(None)
 _ui = adsk.core.UserInterface.cast(None)
 
@@ -16,26 +16,24 @@ _errMessage = adsk.core.TextBoxCommandInput.cast(None)
 
 _handlers = []
 
-#アドイン起動時の処理
+# アドイン起動時の処理
 def run(context):
     try:
         global _app, _ui
         _app = adsk.core.Application.get()
         _ui = _app.userInterface
         
-        _ui.messageBox('Start addin')
-        
-        #コマンドの作成
+        # コマンドの作成
         cmdDef = _ui.commandDefinitions.addButtonDefinition('Rectangular_Tube_PythonAddIn','中空角棒作成','中空角棒を新しいコンポーネントで作る。', 'resources/Rectangular_Tube')
         createPanel = _ui.allToolbarPanels.itemById('SolidCreatePanel')
         createPanel.controls.addCommand(cmdDef)
         
-        #コマンド作成時のイベントハンドラを紐付け
+        # コマンド作成時のイベントハンドラを紐付け
         onCommandCreated = RTCommandCreatedHandler()
         cmdDef.commandCreated.add(onCommandCreated)
         _handlers.append(onCommandCreated)
         
-        #初回起動時
+        # 初回起動時
         if context['IsApplicationStartup'] == False:
             _ui.messageBox('「中空角棒作成」コマンドが作成されました。\nモデルワークスペースの作成にあります。')
 
@@ -43,7 +41,7 @@ def run(context):
           if _ui:
               _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
 
-#アドイン終了時の処理
+# アドイン終了時の処理
 def stop(context):
     try:
         createPanel = _ui.allToolbarPanels.itemById('SolidCreatePanel')
@@ -59,7 +57,7 @@ def stop(context):
               _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))       
 
 
-#コマンド作成時のイベントハンドラ
+# コマンド作成時のイベントハンドラ
 class RTCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
     def __init__(self):
         super().__init__()
@@ -69,13 +67,13 @@ class RTCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             
             des = adsk.fusion.Design.cast(_app.activeProduct)
             if not des:
-                #モデルの作業スペースでコマンドが実行されなかった場合
-                _ui.messageBox('It is not supported in current workspace, please change to MODEL workspace and try again.')
+                # モデルの作業スペースでコマンドが実行されなかった場合
+                _ui.messageBox('It is not supported in current workspace.\nPlease change to MODEL workspace and try again.')
                 return()
             
             #_ui.messageBox(des.unitsManager.defaultLengthUnits)
             
-            #各アトリビュートの作成(groupName:RectangularTube)
+            # 各アトリビュートの作成(groupName:RectangularTube)
             # 各デフォルト値の単位はcm
             width = '1'            
             widthAttrib = des.attributes.itemByName('RectangularTube', 'width')
@@ -98,13 +96,13 @@ class RTCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             #    thickness = thicknessAttrib.value
             
             cmd = eventArgs.command
-            #ユーザが先に別のコマンドを実行した場合の処理(True:実行,False:終了)
+            # ユーザが先に別のコマンドを実行した場合の処理(True:実行,False:終了)
             cmd.isExecutedWhenPreEmpted = False
             inputs = cmd.commandInputs
             
             global _width, _height, _length, _thickness, _errMessage
             
-            #コマンドダイアログの定義
+            # コマンドダイアログの定義
             _width = inputs.addValueInput('width', '幅', 'mm', adsk.core.ValueInput.createByReal(float(width)))
             _height = inputs.addValueInput('height', '高さ', 'mm', adsk.core.ValueInput.createByReal(float(height)))
             _length = inputs.addValueInput('length', '長さ', 'mm', adsk.core.ValueInput.createByReal(float(length)))
@@ -112,7 +110,7 @@ class RTCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             _errMessage = inputs.addTextBoxCommandInput('errMessage', '', '', 2, True)
             _errMessage.isFullWidth = True
             
-            #コマンド関係の各イベントを紐付け
+            # コマンド関係の各イベントを紐付け
             onExecute = RTCommandExecuteHandler()
             cmd.execute.add(onExecute)
             _handlers.append(onExecute)        
@@ -134,7 +132,7 @@ class RTCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
                 _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
 
 
-#コマンド実行時のイベントハンドラ
+# コマンド実行時のイベントハンドラ
 class RTCommandExecuteHandler(adsk.core.CommandEventHandler):
     def __init__(self):
         super().__init__()
@@ -167,7 +165,7 @@ class RTCommandExecuteHandler(adsk.core.CommandEventHandler):
                 _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))            
 
 
-#コマンドの入力変化時のイベントハンドラ
+# コマンドの入力変化時のイベントハンドラ
 class RTCommandInputChangedHandler(adsk.core.InputChangedEventHandler):
     def __init__(self):
         super().__init__()
@@ -180,7 +178,7 @@ class RTCommandInputChangedHandler(adsk.core.InputChangedEventHandler):
                 _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))            
 
 
-#コマンドの入力が正しいか確かめる時のイベントハンドラ
+# コマンドの入力が正しいか確かめる時のイベントハンドラ
 class RTCommandValidateInputsHandler(adsk.core.ValidateInputsEventHandler):
     def __init__(self):
         super().__init__()
@@ -229,7 +227,7 @@ class RTCommandValidateInputsHandler(adsk.core.ValidateInputsEventHandler):
                 _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))            
             
             
-#コマンド終了時のイベントハンドラ
+# コマンド終了時のイベントハンドラ
 class RTCommandDestroyHandler(adsk.core.CommandEventHandler):
     def __init__(self):
         super().__init__()
@@ -246,7 +244,7 @@ class RTCommandDestroyHandler(adsk.core.CommandEventHandler):
                 _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
 
 
-#中空角棒を新しいコンポーネントで作成する関数
+# 中空角棒を新しいコンポーネントで作成する関数
 def makeRectangularTube(design, width, height, length, thickness):
     try:
         # Create a new component by creating an occurrence.
