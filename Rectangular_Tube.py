@@ -255,7 +255,8 @@ def makeRectangularTube(design, width, height, length, thickness):
         #押し出し入力(引数)を作成
         extInput = extrudes.createInput(prof, adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
         distance = adsk.core.ValueInput.createByReal(length)
-        extInput.setDistanceExtent(False, distance)
+        #extInput.setDistanceExtent(False, distance) # 片側だけ押し出す
+        extInput.setSymmetricExtent(distance,True) # 左右対称に押し出す
         extInput.isSolid = True
         # 押し出し
         extrudes.add(extInput)
