@@ -1,0 +1,13 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"addin",
+	"id":	"259f2485-80d4-4946-b92e-db64f9edc95e",
+	"author":	"Notta",
+	"description":	{
+		"":	"Make Rectangular Tube"
+	},
+	"version":	"",
+	"runOnStartup":	false,
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
+}
