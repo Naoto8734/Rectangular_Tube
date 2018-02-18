@@ -71,8 +71,6 @@ class RTCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
                 _ui.messageBox('It is not supported in current workspace.\nPlease change to MODEL workspace and try again.')
                 return()
             
-            #_ui.messageBox(des.unitsManager.defaultLengthUnits)
-            
             # 各アトリビュートの作成(groupName:RectangularTube)
             # 各デフォルト値の単位はcm
             width = '1'            
@@ -122,10 +120,6 @@ class RTCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             onValidateInputs = RTCommandValidateInputsHandler()
             cmd.validateInputs.add(onValidateInputs)
             _handlers.append(onValidateInputs)
-
-            onDestroy = RTCommandDestroyHandler()
-            cmd.destroy.add(onDestroy)
-            _handlers.append(onDestroy)
 
         except:
             if _ui:
@@ -225,23 +219,6 @@ class RTCommandValidateInputsHandler(adsk.core.ValidateInputsEventHandler):
         except:
             if _ui:
                 _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))            
-            
-            
-# コマンド終了時のイベントハンドラ
-class RTCommandDestroyHandler(adsk.core.CommandEventHandler):
-    def __init__(self):
-        super().__init__()
-    def notify(self, args):
-        try:
-            # when the command is done, terminate the script
-            # コマンドが実行されると、スクリプトが終了します
-            # this will release all globals which will remove all event handlers
-            # これは、すべてのイベントハンドラを削除する、すべてのグローバルを解放します
-            adsk.terminate()
-
-        except:
-            if _ui:
-                _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
 
 
 # 中空角棒を新しいコンポーネントで作成する関数
