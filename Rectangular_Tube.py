@@ -16,6 +16,7 @@ _errMessage = adsk.core.TextBoxCommandInput.cast(None)
 
 _handlers = []
 
+#アドイン起動時の処理
 def run(context):
     try:
         global _app, _ui
@@ -24,35 +25,39 @@ def run(context):
         
         _ui.messageBox('Start addin')
         
-        #コマンドが存在するか確認
-        cmdDef = _ui.commandDefinitions.itemById('Rectangular_Tube')
-        if not cmdDef:
-            #コマンドの定義を作成
-            cmdDef = _ui.commandDefinitions.addButtonDefinition('Rectangular_Tube','中空角棒の作成','中空角棒を新しいコンポーネントで作る。', 'resources/Rectangular_Tube')
+        #コマンドの作成
+        cmdDef = _ui.commandDefinitions.addButtonDefinition('Rectangular_Tube_PythonAddIn','中空角棒作成','中空角棒を新しいコンポーネントで作る。', 'resources/Rectangular_Tube')
+        createPanel = _ui.allToolbarPanels.itemById('SolidCreatePanel')
+        createPanel.controls.addCommand(cmdDef)
         
-        #コマンドにイベントハンドラを紐付け
+        #コマンド作成時のイベントハンドラを紐付け
         onCommandCreated = RTCommandCreatedHandler()
         cmdDef.commandCreated.add(onCommandCreated)
         _handlers.append(onCommandCreated)
-
-        #コマンドの実行
-        cmdDef.execute()
-    
-        # Prevent this module from being terminate when the script returns,because we are waiting for event handlers to fire
-        # 私たちが、発生するイベントハンドラの待機中のため、スクリプトが返るとき、このモジュールが終了するのを防ぎます。
-        adsk.autoTerminate(False)
+        
+        #初回起動時
+        if context['IsApplicationStartup'] == False:
+            _ui.messageBox('「中空角棒作成」コマンドが作成されました。\nモデルワークスペースの作成にあります。')
 
     except:
           if _ui:
               _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
 
-
+#アドイン終了時の処理
 def stop(context):
     try:
-        _ui.messageBox('Stop addin')
+        createPanel = _ui.allToolbarPanels.itemById('SolidCreatePanel')
+        RTButton = createPanel.controls.itemById('Rectangular_Tube_PythonAddIn')       
+        if RTButton:
+            RTButton.deleteMe()
+        
+        cmdDef = _ui.commandDefinitions.itemById('Rectangular_Tube_PythonAddIn')
+        if cmdDef:
+            cmdDef.deleteMe()
     except:
           if _ui:
               _ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))       
+
 
 #コマンド作成時のイベントハンドラ
 class RTCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
