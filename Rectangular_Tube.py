@@ -226,9 +226,9 @@ class RTCommandValidateInputsHandler(adsk.core.ValidateInputsEventHandler):
 def makeRectangularTube(design, width, height, length, thickness):
     try:
         # Create a new component by creating an occurrence.
-        occs = design.rootComponent.occurrences
+        occs = design.activeComponent.occurrences
         mat = adsk.core.Matrix3D.create()
-        newOcc = occs.addNewComponent(mat)        
+        newOcc = occs.addNewComponent(mat)  
         newComp = adsk.fusion.Component.cast(newOcc.component)
         
         # 新規スケッチの作成
@@ -255,7 +255,6 @@ def makeRectangularTube(design, width, height, length, thickness):
         #押し出し入力(引数)を作成
         extInput = extrudes.createInput(prof, adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
         distance = adsk.core.ValueInput.createByReal(length)
-        #extInput.setDistanceExtent(False, distance) # 片側だけ押し出す
         extInput.setSymmetricExtent(distance,True) # 左右対称に押し出す
         extInput.isSolid = True
         # 押し出し
