@@ -35,7 +35,7 @@ def run(context):
         
         # 初回起動時
         if context['IsApplicationStartup'] == False:
-            _ui.messageBox('「中空角棒作成」コマンドが作成されました。\nモデルワークスペースの作成にあります。')
+            _ui.messageBox('「中空角棒作成」コマンドが作成されました。\nモデルワークスペースの作成にあります。','Rectamgular Tube')
 
     except:
           if _ui:
@@ -75,23 +75,24 @@ class RTCommandCreatedHandler(adsk.core.CommandCreatedEventHandler):
             # 各デフォルト値の単位はcm
             width = '1'            
             widthAttrib = des.attributes.itemByName('RectangularTube', 'width')
-            #if widthAttrib:
-            #    width = widthAttrib.value
+            if widthAttrib:
+                # 前回コマンド実行時の値がある時は、それを使用
+                width = widthAttrib.value
             
             height = '1'            
             heightAttrib = des.attributes.itemByName('RectangularTube', 'height')
-            #if heightAttrib:
-            #    height = heightAttrib.value
+            if heightAttrib:
+                height = heightAttrib.value
             
             length = '10'            
             lengthAttrib = des.attributes.itemByName('RectangularTube', 'length')
-            #if lengthAttrib:
-            #    length = lengthAttrib.value
+            if lengthAttrib:
+                length = lengthAttrib.value
             
             thickness = '0.1'            
             thicknessAttrib = des.attributes.itemByName('RectangularTube', 'thickness')
-            #if thicknessAttrib:
-            #    thickness = thicknessAttrib.value
+            if thicknessAttrib:
+                thickness = thicknessAttrib.value
             
             cmd = eventArgs.command
             # ユーザが先に別のコマンドを実行した場合の処理(True:実行,False:終了)
@@ -135,10 +136,10 @@ class RTCommandExecuteHandler(adsk.core.CommandEventHandler):
             # 現在の値をアトリビュートとして保存
             des = adsk.fusion.Design.cast(_app.activeProduct)
             attribs = des.attributes
-            attribs.add('RectangularTube', 'width', str(_width))
-            attribs.add('RectangularTube', 'height', str(_height))
-            attribs.add('RectangularTube', 'length', str(_length))
-            attribs.add('RectangularTube', 'thickness', str(_thickness))
+            attribs.add('RectangularTube', 'width', str(_width.value))
+            attribs.add('RectangularTube', 'height', str(_height.value))
+            attribs.add('RectangularTube', 'length', str(_length.value))
+            attribs.add('RectangularTube', 'thickness', str(_thickness.value))
             
             # 現在の値を取得
             width = _width.value
@@ -165,7 +166,7 @@ class RTCommandInputChangedHandler(adsk.core.InputChangedEventHandler):
         super().__init__()
     def notify(self, args):
         try:
-            # 特に何もしない。
+            # 特に何もしない。(今後追加予定)
             eventArgs = adsk.core.ValidateInputsEventArgs.cast(args)
         except:
             if _ui:
@@ -244,7 +245,7 @@ def makeRectangularTube(design, width, height, length, thickness):
                
         # オフセットを作成。
         dirPoint = adsk.core.Point3D.create(0, 0, 0)
-        offsetCurves = sketch.offset(curves, dirPoint, thickness)
+        sketch.offset(curves, dirPoint, thickness)
         
         #プロファイルを取得
         prof = sketch.profiles.item(0)
